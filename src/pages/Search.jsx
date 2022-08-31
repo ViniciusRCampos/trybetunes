@@ -21,11 +21,10 @@ class Search extends React.Component {
 
   handleClick = () => {
     const { artistname } = this.state;
-    this.setState({ loading: true }, async () => {
+    this.setState({ artist: artistname, loading: true }, async () => {
       const albums = await searchAlbumsAPI(artistname);
       this.setState(
-        { artist: artistname,
-          albumlist: albums,
+        { albumlist: albums,
           loading: false,
           artistname: '' },
         () => this.buttonStatus(),
