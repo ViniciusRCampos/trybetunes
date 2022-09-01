@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { addSong, getFavoriteSongs } from '../services/favoriteSongsAPI';
+import { addSong, getFavoriteSongs, removeSong } from '../services/favoriteSongsAPI';
 import Header from '../components/Header';
 import getMusics from '../services/musicsAPI';
 import Loading from './Loading';
@@ -40,7 +40,7 @@ class Album extends React.Component {
     const { musicList } = this.state;
     const track = musicList.find((element) => element.trackId === Number(id));
     this.setState({ loading: true }, async () => {
-      if (target.checked) await addSong(track);
+      if (target.checked) { await addSong(track); } else { await removeSong(track); }
       const favoriteList = await getFavoriteSongs();
       this.setState({
         favoriteList,
