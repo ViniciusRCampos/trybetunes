@@ -1,14 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { addSong, getFavoriteSongs } from '../services/favoriteSongsAPI';
 import Header from '../components/Header';
-import MusicCard from '../components/MusicCard';
 import getMusics from '../services/musicsAPI';
 import Loading from './Loading';
+import MusicCard from '../components/MusicCard';
 
 class Album extends React.Component {
   state = {
-    loading: true,
+    loading: false,
     musicList: [],
+    favoriteList: [],
+    artworkUrl100: '',
+    collectionName: '',
+    artistName: '',
   };
 
   componentDidMount() {
@@ -18,13 +23,34 @@ class Album extends React.Component {
   musics = async () => {
     const { match: { params: { id } } } = this.props;
     const musicList = await getMusics(id);
-    this.setState({ musicList, loading: false });
+    const album = musicList[0];
+    const { artworkUrl100, collectionName, artistName } = album;
+    this.setState({ musicList,
+      loading: false,
+      artworkUrl100,
+      collectionName,
+      artistName,
+    });
+  };
+
+  handleCheckbox = async ({ target }) => {
+    const { id } = target;
+    const { musicList } = this.state;
+    const track = musicList.find((element) => element.trackId === Number(id));
+    this.setState({ loading: true }, async () => {
+      if (target.checked) await addSong(track);
+      const favoriteList = await getFavoriteSongs();
+      this.setState({
+        favoriteList,
+        loading: false,
+      });
+    });
   };
 
   render() {
-    const { musicList, loading } = this.state;
+    const { musicList, loading, artworkUrl100,
+      collectionName, artistName, favoriteList } = this.state;
     const music = musicList.filter((element) => element.kind === 'song');
-    const album = musicList[0];
     return (
       <div>
         <Header />
@@ -34,12 +60,32 @@ class Album extends React.Component {
         {loading ? <Loading />
           : (
             <section>
-              <MusicCard
-                artworkUrl100={ album.artworkUrl100 }
-                collectionName={ album.collectionName }
-                artistName={ album.artistName }
-                music={ music }
-              />
+              <section>
+                <img
+                  src={ artworkUrl100 }
+                  alt={ collectionName }
+                  id={ collectionName }
+                />
+                <h2 data-testid="album-name">{ collectionName }</h2>
+                <h3 data-testid="artist-name">{ artistName }</h3>
+              </section>
+              <section>
+                { music.map((track) => {
+                  const { trackId, trackName, previewUrl } = track;
+                  return (
+                    <MusicCard
+                      key={ trackId }
+                      trackId={ trackId }
+                      trackName={ trackName }
+                      previewUrl={ previewUrl }
+                      handleCheckbox={ this.handleCheckbox }
+                      checked={ favoriteList.some(
+                        (element) => element.trackId === track.trackId,
+                      ) }
+                    />
+                  );
+                })}
+              </section>
             </section>
           )}
       </div>

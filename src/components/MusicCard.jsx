@@ -3,37 +3,33 @@ import React, { Component } from 'react';
 
 export default class MusicCard extends Component {
   render() {
-    const { artworkUrl100, collectionName,
-      artistName, music = [] } = this.props;
-
+    const { trackId, trackName, previewUrl,
+      checked, handleCheckbox } = this.props;
     return (
       <section>
-        <section>
-          <img
-            src={ artworkUrl100 }
-            alt={ collectionName }
-            id={ collectionName }
-          />
-          <h2 data-testid="album-name">{ collectionName }</h2>
-          <h3 data-testid="artist-name">{ artistName }</h3>
-        </section>
-        <section>
-          { music.map((track) => {
-            const { trackId, trackName, previewUrl } = track;
-            return (
-              <section key={ trackId }>
-                <p>{trackName}</p>
-                <audio data-testid="audio-component" src={ previewUrl } controls>
-                  <track kind="captions" />
-                  O seu navegador não suporta o elemento
-                  {' '}
-                  <code>audio</code>
-                  .
-                </audio>
-              </section>
-
-            );
-          })}
+        <section key={ trackId }>
+          <label
+            htmlFor={ trackId }
+            data-testid={ `checkbox-music-${trackId}` }
+          >
+            {' '}
+            Favorita
+            <input
+              type="checkbox"
+              name="favoriteSong"
+              id={ trackId }
+              onChange={ handleCheckbox }
+              checked={ checked }
+            />
+          </label>
+          <p>{trackName}</p>
+          <audio data-testid="audio-component" src={ previewUrl } controls>
+            <track kind="captions" />
+            O seu navegador não suporta o elemento
+            {' '}
+            <code>audio</code>
+            .
+          </audio>
         </section>
       </section>
     );
