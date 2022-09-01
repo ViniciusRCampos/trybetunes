@@ -23,6 +23,7 @@ class Album extends React.Component {
   musics = async () => {
     const { match: { params: { id } } } = this.props;
     const musicList = await getMusics(id);
+    const favoriteList = await getFavoriteSongs();
     const album = musicList[0];
     const { artworkUrl100, collectionName, artistName } = album;
     this.setState({ musicList,
@@ -30,6 +31,7 @@ class Album extends React.Component {
       artworkUrl100,
       collectionName,
       artistName,
+      favoriteList,
     });
   };
 
