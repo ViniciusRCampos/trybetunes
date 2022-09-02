@@ -10,16 +10,17 @@ export default class CardAlbum extends Component {
     return (
       <div>
         <img src={ artworkUrl100 } alt={ artistName } />
-        <h3>{ artistName }</h3>
-        <p>{ collectionPrice }</p>
-        <p>{ releaseDate }</p>
-        <p>{ trackCount }</p>
+        <br />
         <Link
           to={ `/album/${collectionId}` }
           data-testid={ `link-to-album-${collectionId}` }
         >
           {collectionName}
         </Link>
+        <h3>{ `Artist: ${artistName}` }</h3>
+        <p>{ `Price: ${collectionPrice}` }</p>
+        <p>{ `Release: ${releaseDate}`}</p>
+        <p>{ `Tracks: ${trackCount}` }</p>
       </div>
     );
   }
