@@ -1,6 +1,6 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
-// import PropType from 'prop-types';
+import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import { getUser, updateUser } from '../services/userAPI';
 import Loading from './Loading';
@@ -8,12 +8,10 @@ import Loading from './Loading';
 class ProfileEdit extends React.Component {
   state = {
     loading: false,
-    profileName: '',
-    profileImage: '',
-    profileDescription: '',
-    profileEmail: '',
-    isDisabled: true,
-    saved: false,
+    name: '',
+    image: '',
+    description: '',
+    email: '',
   };
 
   componentDidMount() {
@@ -29,57 +27,70 @@ class ProfileEdit extends React.Component {
         const { name, email, image,
           description } = userName;
         this.setState({
-          profileName: name,
-          profileImage: image,
-          profileDescription: description,
-          profileEmail: email,
+          name,
+          image,
+          description,
+          email,
         });
       });
     });
   };
 
   // CORRIGIR FUNÇÃO VERIFY BUTTON E TESTAR DE NOVO
+  // verifyButton = () => {
+  //   const { name, email, description, image } = this.state;
+  //   if (name !== '' && email !== '' && description !== '' && image !== '') {
+  //     this.setState({ isDisabled: false });
+  //   } else {
+  //     this.setState({ isDisabled: true });
+  //   }
+  // };
+
   verifyButton = () => {
-    const {
-      profileName,
-      profileImage,
-      profileEmail,
-      profileDescription,
-    } = this.state;
-    if (profileName && profileDescription
-        && profileImage && profileEmail) {
-      this.setState({ isDisabled: false });
-    }
-    this.setState({ isDisabled: true });
+    const { name, email, description, image } = this.state;
+    const userInfo = [name, email, description, image];
+    const buttonStatus = userInfo.some((propriedade) => propriedade.length === 0);
+    this.setState({ isDisabled: buttonStatus });
   };
 
-  //   updateUserName = async (user) => {
-  //     await updateUser(user);
-  //   };
+  // updateUserName = async (user) => {
+  //   await updateUser(user);
+  // };
 
   handleChange = ({ target }) => {
-    const { value, name } = target;
-    this.setState({ [name]: value }, this.verifyButton());
+    const { value, id } = target;
+    this.setState({ [id]: value }, this.verifyButton());
   };
 
   handleClick = () => {
-    const { profileImage, profileDescription,
-      profileName, profileEmail } = this.state;
-    const update = {
-      name: profileName,
-      image: profileImage,
-      description: profileDescription,
-      email: profileEmail,
-    };
-    this.setState({ saved: true }, async () => {
+    this.setState({ loading: true }, async () => {
+      const { image, description,
+        name, email } = this.state;
+      const update = {
+        name,
+        email,
+        image,
+        description,
+      };
       await updateUser(update);
+      this.setState({ loading: false, saved: true })
     });
   };
 
+  // handleClick = () => {
+  //   this.setState({ loading: true });
+  //   const { name, email, description, image } = this.state;
+  //   this.setState({ loading: false }, async () => {
+  //     await updateUser({ name, email, description, image });
+  //   }, () => {
+  //     const { history } = this.props;
+  //     history.push('/profile');
+  //   });
+  // };
+
   render() {
-    const { loading, profileName, profileImage,
-      profileDescription, profileEmail, isDisabled,
-      saved } = this.state;
+    const { loading, name, image,
+      description, email, isDisabled, saved } = this.state;
     return (
       <div>
         <Header />
@@ -91,57 +102,51 @@ class ProfileEdit extends React.Component {
             <section>
               <form className="form-profile-edit">
                 <img
-                  src={ profileImage }
-                  alt={ profileName }
+                  src={ image }
+                  alt={ name }
                   className="image-profile-edit"
-                  onChange={ this.handleChange }
-                  name={ profileImage }
                 />
-                <label htmlFor="editName">
-                  Image:
+                <label htmlFor="image">
+                  Imagem:
                   <input
                     data-testid="edit-input-image"
                     type="text"
-                    name="profileImage"
-                    id="editImage"
+                    id="image"
                     className="input"
                     onChange={ this.handleChange }
-                    value={ profileImage }
+                    value={ image }
                   />
                 </label>
-                <label htmlFor="editName">
+                <label htmlFor="name">
                   Nome:
                   <input
                     data-testid="edit-input-name"
                     type="text"
-                    name="profileName"
-                    id="editName"
+                    id="name"
                     className="input"
                     onChange={ this.handleChange }
-                    value={ profileName }
+                    value={ name }
                   />
                 </label>
-                <label htmlFor="editEmail">
-                  Email:
+                <label htmlFor="email">
+                  E-mail:
                   <input
                     data-testid="edit-input-email"
-                    type="text"
-                    name="profileEmail"
-                    id="editEmail"
+                    type="email"
+                    id="email"
                     onChange={ this.handleChange }
                     className="input"
-                    value={ profileEmail }
+                    value={ email }
                   />
                 </label>
-                <label htmlFor="editDescription">
+                <label htmlFor="description">
                   Description:
                   <textarea
                     data-testid="edit-input-description"
-                    name="profileDescription"
-                    id="editDescription"
+                    id="description"
                     onChange={ this.handleChange }
                     className="input"
-                    value={ profileDescription }
+                    value={ description }
                   />
                 </label>
               </form>
@@ -161,5 +166,11 @@ class ProfileEdit extends React.Component {
     );
   }
 }
+
+ProfileEdit.propTypes = {
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }).isRequired,
+};
 
 export default ProfileEdit;
